@@ -22,8 +22,11 @@ frontend/npm-debug.log*
 frontend/yarn-debug.log*
 frontend/yarn-error.log*
 
-# DB
-**/*.db
+# Database files
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
 
 # IDE specific files
 .idea/
