@@ -2,13 +2,15 @@ import { useState } from 'react'
 import { loginUser } from '../api/userApi';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../routers/AuthContext';
+import { useToken } from '../routers/TokenContext';
 
 function Login() {
     const [formData, setFormData] = useState({
         username: "",
         password: ""
     });
-    const [message, setMessage] = useState("")
+    const [ message, setMessage ] = useState("")
+    const setAccessToken = useToken()
     const navigate = useNavigate();
 
     const { login } = useAuth();
@@ -27,9 +29,9 @@ function Login() {
         try {
             const data = await loginUser(formData)
             console.log(data)
+            setAccessToken(data.access_token)
             setMessage("Login Successful");
             login();
-            console.log('navigating to dashboard')
             navigate('/dashboard');
         } catch (error) {
             setMessage(error.message);
