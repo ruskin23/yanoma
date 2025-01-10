@@ -1,0 +1,33 @@
+# Python backend
+backend/yanoma_venv/
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+.Python
+backend/.env
+backend/.env.*
+
+# React frontend
+frontend/node_modules/
+frontend/.env
+frontend/.env.local
+frontend/.env.development
+frontend/.env.test
+frontend/.env.production
+frontend/build/
+frontend/dist/
+frontend/coverage/
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+# DB
+**/*.db
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
