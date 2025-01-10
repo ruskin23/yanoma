@@ -10,12 +10,10 @@ const Dashboard = () => {
   const [ newCollection, setNewCollection ] = useState(false)
 
   useEffect(() => {
-    // First check if there's data in localStorage
     const savedData = localStorage.getItem('notesData')
     if (savedData) {
         setCollections(JSON.parse(savedData))
     } else {
-        // If not, use the imported JSON
         setCollections(notesData)
         localStorage.setItem('notesData', JSON.stringify(notesData))
     }

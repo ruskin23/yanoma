@@ -5,15 +5,15 @@ import { useAuth } from '../routers/AuthContext';
 import { useToken } from '../routers/TokenContext';
 
 function Login() {
-    const [formData, setFormData] = useState({
+    const [ formData, setFormData ] = useState({
         username: "",
         password: ""
     });
     const [ message, setMessage ] = useState("")
-    const setAccessToken = useToken()
+    const { setAccessToken } = useToken()
     const navigate = useNavigate();
 
-    const { login } = useAuth();
+    const { isLoggedIn, login } = useAuth();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -25,17 +25,19 @@ function Login() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         try {
-            const data = await loginUser(formData)
-            console.log(data)
-            setAccessToken(data.access_token)
+            const creds = await loginUser(formData)
+
+            setAccessToken(creds.access_token)
             setMessage("Login Successful");
+
             login();
-            navigate('/dashboard');
+            navigate('/dashboard');    
         } catch (error) {
-            setMessage(error.message);
+            console.error(error)
+            setMessage("Login Failed");
         }
+
         setFormData({
             username: "",
             password: ""        

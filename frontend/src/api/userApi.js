@@ -7,15 +7,15 @@ const userApi = async (data, url) => {
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify(data),
+                credentials: "include"
             });
         
-        console.log(response)
         if (!response.ok) {
             
             const errorData = await response.json();
             console.log("Error Data:", errorData)
-            throw new Error(errorData.message || "Failed to Register");
+            throw new Error(errorData.message);
         }
         
         return await response.json();
