@@ -22,7 +22,7 @@ def get_notes():
 
 @notes_bp.route('/get/int:pk', methods=['GET'])
 @jwt_required()
-def get_notes():
+def get_noteby_id():
     """Get a specific notes of the user"""
     user_id = get_jwt_identity()
 
@@ -40,15 +40,15 @@ def add_note():
         'message': 'Note created successfully'
     }), 201
     
-@notes_bp.route("/update", method=[''])
+@notes_bp.route("/update", methods=[''])
 @jwt_required()
 def update_note():
     """Update a note"""
     user_id = get_jwt_identity()
     
-@notes_bp.route("/delete", method=[''])
+@notes_bp.route("/delete", methods=[''])
 @jwt_required()
-def update_note():
+def delete_note():
     """Delete a note"""
     user_id = get_jwt_identity()
 

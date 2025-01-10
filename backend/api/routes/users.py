@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, make_response
 from api.models import User
 from api.extensions import db, bcrypt, jwt
 from api.error_handling import user_errors
@@ -26,14 +26,23 @@ def login():
     data = request.json
     user = User.query.filter_by(username=data['username']).first()
     if user and bcrypt.check_password_hash(user.password, data['password']):
-        access_token = create_access_token(identity=user.id)
-        refresh_token = create_refresh_token(identity=user.id)
+        access_token = create_access_token(identity=str(user.id))
+        refresh_token = create_refresh_token(identity=str(user.id))
 
-        return jsonify({
-            'access_token': access_token,
-            'refresh_token': refresh_token
-        }), 200
+        response = make_response(jsonify({
+            'access_token': access_token
+        }), 200)
 
+        response.set_cookie(
+            'refresh_token',
+            refresh_token,
+            httponly=True,
+            secure=False,
+            samesite='Strict'
+        )
+        
+        return response
+    
     return jsonify({
         'message': 'Invalid Credentials'
     }), 401
@@ -50,9 +59,12 @@ def reset_request():
 def reset_password():
     pass
 
-@users_bp.route('/refresh', methods=['POST'])
+@users_bp.route('/refresh', methods=['GET'])
 @jwt_required(refresh=True)
 def refresh():
+    print("Refresh Token")
+    print(request.cookies.get('refresh_token'))
+
     current_user = get_jwt_identity()
     new_access_token = create_access_token(identity=current_user)
     return jsonify({
