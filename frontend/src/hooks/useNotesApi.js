@@ -56,10 +56,36 @@ export const useNotesApi = () => {
         )
     }
 
+    const deleteCollection = (collectionId) => {
+        return fetchSecure(
+            `/notes/delete/collection/${collectionId}`,
+            {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }
+        )
+    }
+
+    const deleteNote = (collectionId, noteId) => {
+        return fetchSecure(
+            `/notes/delete/note/${collectionId}/${noteId}`,
+            {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }
+        )
+    }
+    
     return {
         getNotes,
         addNewCollection,
         addNewNote,
-        updateNote
+        updateNote,
+        deleteCollection,
+        deleteNote
     }
 }

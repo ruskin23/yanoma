@@ -11,40 +11,15 @@ function NoteDisplay({ collection, setCollections }) {
 
     const handleDeleteCollection = (e) => {
         const collectionId = e.target.value
-        setCollections(prevCollections => prevCollections.filter(collection => collection.id != collectionId))
+        const removeCollection = async () => {
+            const response = await notesApi.deleteCollection(collectionId)
+            setCollections(prevCollections => prevCollections.filter(collection => collection.id != response.id))
+        }
+        removeCollection();
     }
 
     const toggleNewNote = () => {
         setNewNote(!newNote);
-    }
-
-    const handleSaveNoteT = (noteObj) => {
-        const noteToAdd = {
-            id: noteObj.id,
-            title: noteObj.title,
-            description: noteObj.description,
-        }
-
-        setCollections(prevCollections => prevCollections.map(col => {
-            if (col.id === collection.id) {
-                if (noteObj.mode === "edit") {
-                    return {
-                        ...col,
-                        notes: col.notes.map(note => 
-                            note.id === noteObj.id ? noteToAdd : note
-                        )
-                    }
-                } else {
-                    return {
-                        ...col,
-                        notes: [...col.notes, noteToAdd]
-                    }
-                }
-            }
-            return col
-        }))
-    
-        if (noteObj.mode !== "edit") toggleNewNote()
     }
 
     const handleSaveNote = (noteObj) => {
@@ -94,15 +69,19 @@ function NoteDisplay({ collection, setCollections }) {
 
     const handleDeleteNote = (e) => {
         const noteId = e.target.value
-        setCollections(prevCollections => prevCollections.map(col => {
-            if (col.id === collection.id) {
-                return {
-                    ...col,
-                    notes: col.notes.filter(note => note.id != noteId)
+        const removeNote = async () => {
+            const response = notesApi.deleteNote(collection.id, noteId)
+            setCollections(prevCollections => prevCollections.map(col => {
+                if (col.id === collection.id) {
+                    return {
+                        ...col,
+                        notes: col.notes.filter(note => note.id != noteId)
+                    }
                 }
-            }
-            return col
-        }))
+                return col
+            }))    
+        }
+        removeNote();
     }
 
     return (
