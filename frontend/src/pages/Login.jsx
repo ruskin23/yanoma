@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { loginUser } from '../api/userApi';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../routers/AuthContext';
-import { useToken } from '../routers/TokenContext';
+import { useAuth } from '../context/AuthContext';
 
 function Login() {
     const [ formData, setFormData ] = useState({
@@ -10,10 +9,9 @@ function Login() {
         password: ""
     });
     const [ message, setMessage ] = useState("")
-    const { setAccessToken } = useToken()
-    const navigate = useNavigate();
+    const { login } = useAuth();
 
-    const { isLoggedIn, login } = useAuth();
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -27,21 +25,17 @@ function Login() {
         e.preventDefault();
         try {
             const creds = await loginUser(formData)
-
-            setAccessToken(creds.access_token)
-            setMessage("Login Successful");
-
-            login();
-            navigate('/dashboard');    
+            console.log(creds)
+            login(creds.access_token);
+            navigate('/dashboard');
         } catch (error) {
             console.error(error)
+            setFormData({
+                username: "",
+                password: ""
+            });
             setMessage("Login Failed");
         }
-
-        setFormData({
-            username: "",
-            password: ""        
-        });
     }
 
     const handleRegister = () => {

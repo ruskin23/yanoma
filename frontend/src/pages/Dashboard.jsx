@@ -3,13 +3,21 @@ import { useState, useEffect } from "react";
 import NoteDisplay from "../components/NoteDisplay";
 import NewCollection from "../components/NewCollection";
 import notesData from './notes.json'
+import { useNotesApi } from "../hooks/useNotesApi";
+import { useAuth } from "../context/AuthContext";
 
 const Dashboard = () => {
 
   const [ collections, setCollections ] = useState([])
   const [ newCollection, setNewCollection ] = useState(false)
+  const { accessToken } = useAuth()
+
+  const notesApi = useNotesApi()
 
   useEffect(() => {
+
+    console.log('Dashboard mounting...');
+
     const savedData = localStorage.getItem('notesData')
     if (savedData) {
         setCollections(JSON.parse(savedData))
@@ -17,6 +25,21 @@ const Dashboard = () => {
         setCollections(notesData)
         localStorage.setItem('notesData', JSON.stringify(notesData))
     }
+
+    if (accessToken) {
+        const loadNotes = async () => {
+            try {
+                const data = await notesApi.getNotes()
+                console.log(data)
+            } catch (error) {
+                console.log(`Failed to load notes: `, error)
+            }
+        }
+        loadNotes()    
+    }
+    return () => {
+        console.log('Dashboard unmounting...');
+    };
   }, [])
 
   const toggleNewCollection = () => {

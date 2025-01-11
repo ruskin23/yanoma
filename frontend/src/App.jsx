@@ -1,16 +1,13 @@
 import './App.css'
-import { AuthProvider } from './routers/AuthContext'
-import { TokenProvider } from './routers/TokenContext'
-import AppRouter from './routers/AppRoutes'
+import { AuthProvider } from './context/AuthContext'
+import AppRouter from './routers/AppRouter'
 
 function App() {
 
   return (
-    <TokenProvider>
-      <AuthProvider>
-        <AppRouter />
-      </AuthProvider>
-    </TokenProvider>
+    <AuthProvider>
+      <AppRouter />
+    </AuthProvider>
   )
 }
 

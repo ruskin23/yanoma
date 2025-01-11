@@ -1,4 +1,4 @@
-import { useAuth } from "../routers/AuthContext";
+import { useAuth } from "../context/AuthContext";
 
 function NavBar() {
     const { logout } = useAuth();
