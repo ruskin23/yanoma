@@ -2,11 +2,13 @@ import { useState } from "react";
 
 import NoteCard from "./NoteCard"
 import NewNote from "./NewNote";
+import { useNotesApi } from "../hooks/useNotesApi";
 
 function NoteDisplay({ collection, setCollections }) {
-    
+
     const [ newNote, setNewNote ] = useState(false);
-    
+    const notesApi = useNotesApi()
+
     const handleDeleteCollection = (e) => {
         const collectionId = e.target.value
         setCollections(prevCollections => prevCollections.filter(collection => collection.id != collectionId))
@@ -15,15 +17,14 @@ function NoteDisplay({ collection, setCollections }) {
     const toggleNewNote = () => {
         setNewNote(!newNote);
     }
-    
-    const handleSaveNote = (noteObj) => {
+
+    const handleSaveNoteT = (noteObj) => {
         const noteToAdd = {
             id: noteObj.id,
             title: noteObj.title,
             description: noteObj.description,
-            content: noteObj.content
         }
-    
+
         setCollections(prevCollections => prevCollections.map(col => {
             if (col.id === collection.id) {
                 if (noteObj.mode === "edit") {
@@ -43,6 +44,51 @@ function NoteDisplay({ collection, setCollections }) {
             return col
         }))
     
+        if (noteObj.mode !== "edit") toggleNewNote()
+    }
+
+    const handleSaveNote = (noteObj) => {
+
+        const noteToAdd = {
+            title: noteObj.title,
+            description: noteObj.description,
+        };
+
+        if (noteObj.mode === 'new') {
+            const addNew = async () => {
+                const response = await notesApi.addNewNote(collection.id, noteToAdd);
+                const newNote = response.note;
+                setCollections(prevCollections => prevCollections.map(col => {
+                    if (col.id === collection.id) {
+                        return {
+                            ...col,
+                            notes: [...col.notes, newNote]
+                        }
+                    };
+                    return col;
+                }));
+            };
+
+            addNew();
+        } else if (noteObj.mode === 'edit') {
+            const addNew = async () => {
+                const response = await notesApi.updateNote(collection.id, noteObj.id, noteToAdd);
+                const newNote = response.note;
+                setCollections(prevCollections => prevCollections.map(col => {
+                    if (col.id === collection.id) {
+                        return {
+                            ...col,
+                            notes: col.notes.map(note => 
+                                note.id === newNote.id ? newNote : note)
+                        }
+                    };
+                    return col;
+                }));
+            };
+
+            addNew();
+        }
+
         if (noteObj.mode !== "edit") toggleNewNote()
     }
 
@@ -81,14 +127,14 @@ function NoteDisplay({ collection, setCollections }) {
                     </button>
                 </div>
             </div>
-            
+
             {newNote && (
                 <NewNote 
                     toggleNewNote={toggleNewNote} 
                     handleSaveNote={handleSaveNote} 
                 />
             )}
-    
+
             <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 min-h-0 max-h-96 overflow-auto ${collection.notes.length > 0 ? 'p-4' : 'p-0'}`}>                
                 {collection.notes.map((note) => (
                     <NoteCard 

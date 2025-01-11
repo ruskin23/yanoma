@@ -2,7 +2,7 @@ import React from "react";
 import { useState, useEffect } from "react";
 import NoteDisplay from "../components/NoteDisplay";
 import NewCollection from "../components/NewCollection";
-import notesData from './notes.json'
+// import notesData from './notes.json'
 import { useNotesApi } from "../hooks/useNotesApi";
 import { useAuth } from "../context/AuthContext";
 
@@ -16,31 +16,21 @@ const Dashboard = () => {
 
   useEffect(() => {
 
-    console.log('Dashboard mounting...');
-
-    const savedData = localStorage.getItem('notesData')
-    if (savedData) {
-        setCollections(JSON.parse(savedData))
-    } else {
-        setCollections(notesData)
-        localStorage.setItem('notesData', JSON.stringify(notesData))
-    }
-
+    // console.log("Access Token Dashboard: ", accessToken)
     if (accessToken) {
         const loadNotes = async () => {
             try {
                 const data = await notesApi.getNotes()
-                console.log(data)
+                setCollections(data)
             } catch (error) {
                 console.log(`Failed to load notes: `, error)
             }
         }
-        loadNotes()    
+        loadNotes()
     }
-    return () => {
-        console.log('Dashboard unmounting...');
-    };
-  }, [])
+  }, [accessToken])
+
+  useEffect(() => console.log(collections), [collections])
 
   const toggleNewCollection = () => {
     setNewCollection(!newCollection);
@@ -48,17 +38,17 @@ const Dashboard = () => {
 
   const handleSaveNewCollection = (e) => {
     const { name, value } = e.target
-    const collectionToAdd = {
-        id: Date.now().toString(),
-        heading: value,
-        notes: []
+
+    const addCollection = async () => {
+        try {
+            const response = await notesApi.addNewCollection({heading: value})
+            setCollections(prevData => [response.collection, ...prevData])
+        } catch (err) {
+            console.log("Failed to add collection with error: ", err)
+        }
     }
 
-    setCollections(prevData => {
-      const newData = [...prevData, collectionToAdd]
-      localStorage.setItem('notesData', JSON.stringify(newData))
-      return newData
-    })
+    addCollection();
     
     if (newCollection) setNewCollection(false)
   }
@@ -78,6 +68,12 @@ const Dashboard = () => {
                     </button>  
                 )}
             </header>
+            {newCollection && (
+                    <NewCollection 
+                        handleSaveNewCollection={handleSaveNewCollection}
+                        handleCloseNewCollection={toggleNewCollection}
+                    />
+                )}
 
             <div className="space-y-4">
                 {collections.map((collection) => (
@@ -87,12 +83,6 @@ const Dashboard = () => {
                         setCollections={setCollections}
                     />
                 ))}
-                {newCollection && (
-                    <NewCollection 
-                        handleSaveNewCollection={handleSaveNewCollection}
-                        handleCloseNewCollection={toggleNewCollection}
-                    />
-                )}
             </div>
         </div>
     </div>

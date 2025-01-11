@@ -5,7 +5,6 @@ const NewNote = ({ toggleNewNote, handleSaveNote }) => {
         id: Date.now().toString(),
         title: "",
         description: "",
-        content: "",
         mode: "new"
     })
 

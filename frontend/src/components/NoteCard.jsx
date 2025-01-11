@@ -1,12 +1,11 @@
 import { useState } from "react";
 
 const NoteCard = ({ note, handleSaveNote, handleDeleteNote }) => {
-    const [isEditing, setIsEditing] = useState(false);
+    const [ isEditing, setIsEditing ] = useState(false);
     const [ editNote, setEditNote ] = useState({
         id: note.id,
         title: note.title,
         description: note.description,
-        content: note.content,
         mode: "edit"
     })
 
