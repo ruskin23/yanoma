@@ -3,6 +3,13 @@ from sqlalchemy.exc import IntegrityError
 from api.extensions import db
 
 def authentication_errors(jwt):
+    @jwt.needs_fresh_token_loader
+    def missing_refresh_token_response(header, payload):
+        return jsonify({
+            'error': 'Missing refresh token',
+            'message': 'No refresh token found in cookies'
+        }), 401
+
     @jwt.unauthorized_loader
     def unauthorized_response(error):
         return jsonify({
@@ -30,7 +37,7 @@ def general_errors(app):
     def handle_general_exception(error):
         return jsonify({
             'message': 'An unexpected error occurred',
-            'status': 'error'
+            'status': f'error: {str(error)}'
         }), 500
 
 def user_errors(users_bp):

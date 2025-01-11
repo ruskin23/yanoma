@@ -3,16 +3,24 @@ from flask import Flask
 from api.extensions import db, bcrypt, jwt
 from flask_cors import CORS
 from api.error_handling import general_errors, authentication_errors
+from datetime import timedelta
 
 def create_app():
     app = Flask(__name__)
-    CORS(app, supports_credentials=True)
+    CORS(app, 
+        resources={r"/*": {
+            "origins": "http://localhost:5173",
+            "supports_credentials": True
+        }})
 
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', '')
     app.config['JWT_TOKEN_LOCATION'] = ['headers', 'cookies']
     app.config['JWT_REFRESH_COOKIE_NAME'] = 'refresh_token'
+    
+    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
+    app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
 
     
     # Initialize extensions

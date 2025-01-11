@@ -11,10 +11,10 @@ user_errors(users_bp)
 @users_bp.route('/register', methods = ['POST'])
 def register():
     data = request.json
-    
     hashed_password = bcrypt.generate_password_hash(data['password'].encode('utf-8'))
+
     new_user = User(username=data['username'], email=data['email'], password=hashed_password)
-    
+
     db.session.add(new_user)
     db.session.commit()
     return jsonify({
@@ -37,10 +37,15 @@ def login():
             'refresh_token',
             refresh_token,
             httponly=True,
-            secure=False,
-            samesite='Strict'
+            secure=True,
+            samesite='None',
+            path='/'
         )
-        
+
+        print("Setting cookie with values:")
+        print("Refresh token:", refresh_token)
+        print("Response headers:", response.headers)
+
         return response
     
     return jsonify({
@@ -62,8 +67,11 @@ def reset_password():
 @users_bp.route('/refresh', methods=['GET'])
 @jwt_required(refresh=True)
 def refresh():
-    print("Refresh Token")
-    print(request.cookies.get('refresh_token'))
+    # Debug prints
+    print("Entering refresh endpoint")
+    print("Headers received:", request.headers)
+    print("Cookies received:", request.cookies)
+    print("Refresh token:", request.cookies.get('refresh_token'))
 
     current_user = get_jwt_identity()
     new_access_token = create_access_token(identity=current_user)
