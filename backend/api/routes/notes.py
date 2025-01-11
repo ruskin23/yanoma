@@ -139,3 +139,48 @@ def update_note(collection_id, note_id):
             'description': note.description
         }
     }), 200
+    
+@notes_bp.route("/delete/collection/<int:collection_id>", methods=['DELETE'])
+@jwt_required()
+def delete_collection(collection_id):
+    """Delete a collection and all its associated notes"""
+    user_id = get_jwt_identity()
+    
+    collection = Collections.query.filter_by(
+        id=collection_id,
+        user_id=user_id
+    ).first_or_404()
+    
+    db.session.delete(collection)
+    db.session.commit()
+    
+    return jsonify({
+        'message': 'Successfully deleted collection',
+        'id': collection_id
+    }), 200
+
+@notes_bp.route("/delete/note/<int:collection_id>/<int:note_id>", methods=['DELETE'])
+@jwt_required()
+def delete_note(collection_id, note_id):
+    """Delete a specific note from a collection"""
+    user_id = get_jwt_identity()
+    
+    # Verify collection belongs to user
+    collection = Collections.query.filter_by(
+        id=collection_id,
+        user_id=user_id
+    ).first_or_404()
+    
+    # Find and delete the note
+    note = Note.query.filter_by(
+        id=note_id,
+        collection_id=collection_id
+    ).first_or_404()
+    
+    db.session.delete(note)
+    db.session.commit()
+    
+    return jsonify({
+        'message': 'Successfully deleted note',
+        'id': note_id
+    }), 200
