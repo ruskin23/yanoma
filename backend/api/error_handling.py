@@ -4,7 +4,7 @@ from api.extensions import db
 
 def authentication_errors(jwt):
     @jwt.needs_fresh_token_loader
-    def missing_refresh_token_response(header, payload):
+    def missing_refresh_token_response(header, payload): 
         return jsonify({
             'error': 'Missing refresh token',
             'message': 'No refresh token found in cookies'
